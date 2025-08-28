@@ -6,7 +6,15 @@ import (
 	"net/http"
 )
 
-type 
+type Coffee struct {
+	ID          int
+	Name        string
+	Description string
+	Price       float64
+	Weight      float64
+	RoastLevel  string
+	Status      string
+}
 
 var coffeeMenu = map[string]string{
 	"coffee": "cap",
