@@ -13,25 +13,43 @@ func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := r.URL.Query().Get("key")
-	if key == "" {
-		http.Error(w, "Ключ не передан", http.StatusBadRequest)
+	deleteCoffeesArray := []string{}
+	err := json.NewDecoder(r.Body).Decode(&deleteCoffeesArray)
+	if err != nil {
+		http.Error(w, "Некоректный JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if _, ok := cm.CoffeeDatabase[key]; !ok {
-		http.Error(w, "Такого кофе нет", http.StatusNotFound)
+	if len(deleteCoffeesArray) == 0 {
+		http.Error(w, "Список кофе для удаления пуст", http.StatusBadRequest)
 		return
 	}
 
-	delete(cm.CoffeeDatabase, key)
-	fmt.Printf("Удалено кофе с ключом '%s', текущее меню: %+v\n", key, cm.CoffeeDatabase)
+	for _, value := range deleteCoffeesArray {
 
-	w.Header().Set("Content-Type", "application-json")
-	w.WriteHeader(http.StatusOK) //
-	response := map[string]string{"message": "Кофе удален", "key": key}
-	err := json.NewEncoder(w).Encode(response) //
+		if _, ok := cm.CoffeeDatabase[value]; !ok {
+			badDeletingResponse := fmt.Sprintf("Кофе '%s' не найден", value)
+			http.Error(w, badDeletingResponse, http.StatusBadRequest)
+			return
+		}
+	}
+
+	deletedCoffees := []string{}
+
+	for _, value := range deleteCoffeesArray {
+		delete(cm.CoffeeDatabase, value)
+		deletedCoffees = append(deletedCoffees, value)
+	}
+
+	fmt.Printf("Текущее меню: %+v\n", cm.CoffeeDatabase)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	response := map[string][]string{"Список удалённых кофе": deletedCoffees}
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 }

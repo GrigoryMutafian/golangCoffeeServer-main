@@ -11,7 +11,7 @@ func main() {
 	http.HandleFunc("/addNewCoffee", hn.AddNewCoffee)
 	http.HandleFunc("/deleteCoffee", hn.DeleteCoffee)
 	http.HandleFunc("/updateCoffeeMenu", hn.UpdateCoffeeMenu)
-	http.HandleFunc("/checkStatusOfCoffee", hn.CheckStatusOfCoffee)
+	http.HandleFunc("/GetStatusCoffees", hn.GetStatusCoffees)
 	fmt.Println("Сервер запущен на http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {

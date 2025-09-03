@@ -10,16 +10,16 @@ type Coffee struct {
 	Status      Status
 }
 
-type Status int
+type Status string
 
 const (
-	LowStatus Status = iota
-	MediumStatus
-	HighStatus
+	LowStatus    = "LowStatus"
+	MediumStatus = "MediumStatus"
+	HighStatus   = "HighStatus"
 )
 
 var CoffeeDatabase = map[string]Coffee{
-	"1": {
+	"coffee_id_1": {
 		ID:          1,
 		Name:        "Supremo",
 		Description: "Best coffee from Colombia",
@@ -27,6 +27,15 @@ var CoffeeDatabase = map[string]Coffee{
 		Weight:      250.0,
 		RoastLevel:  "Medium",
 		Status:      LowStatus,
+	},
+	"coffee_id_2": {
+		ID:          2,
+		Name:        "kek",
+		Description: "Best coffee from Russia",
+		Price:       120.0,
+		Weight:      250.0,
+		RoastLevel:  "Medium",
+		Status:      MediumStatus,
 	},
 }
 

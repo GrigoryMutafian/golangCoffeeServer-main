@@ -6,16 +6,33 @@ import (
 	"net/http"
 )
 
-func CheckStatusOfCoffee(w http.ResponseWriter, r *http.Request) {
-	notEnoughCoffee := make(map[string]cm.Status)
+func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 
-	for key := range cm.CoffeeDatabase {
-		if cm.CoffeeDatabase[key].Status == cm.LowStatus {
-			notEnoughCoffee[key] = cm.CoffeeDatabase[key].Status
+	if r.Method != http.MethodPost {
+		http.Error(w, "Неправильный метод: ", http.StatusMethodNotAllowed)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+
+	statusesArray := []cm.Status{}
+	err := json.NewDecoder(r.Body).Decode(&statusesArray)
+	if err != nil {
+		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+	}
+
+	response := make(map[string]cm.Status)
+
+	for _, value := range statusesArray {
+		for key := range cm.CoffeeDatabase {
+			if cm.CoffeeDatabase[key].Status == value {
+				response[key] = cm.CoffeeDatabase[key].Status
+			}
 		}
 	}
+
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(notEnoughCoffee)
+	err = json.NewEncoder(w).Encode(&response)
 	if err != nil {
 		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
 	}
