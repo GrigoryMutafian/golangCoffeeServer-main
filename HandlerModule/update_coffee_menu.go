@@ -8,7 +8,7 @@ import (
 
 func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPatch {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed: ", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -16,7 +16,7 @@ func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	var updateCoffee map[string]cm.Coffee
 	err := json.NewDecoder(r.Body).Decode(&updateCoffee)
 	if err != nil {
-		http.Error(w, "Неверный JSON: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "JSON decoding error: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -27,16 +27,16 @@ func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 			cm.CoffeeDatabase[key] = newValue
 			cm.Update = key
 		} else {
-			http.Error(w, "Такой кофе не найден", http.StatusNotFound)
+			http.Error(w, "Coffee not found", http.StatusNotFound)
 			return
 		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	response := map[string]string{"message": "Кофе " + cm.Update + " обновлён"}
+	response := map[string]string{"message": "Coffee " + cm.Update + " updated"}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "JSON encoding error: "+err.Error(), http.StatusInternalServerError)
 	}
 }

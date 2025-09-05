@@ -9,26 +9,26 @@ import (
 
 func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed: ", http.StatusMethodNotAllowed)
 		return
 	}
 
 	deleteCoffeesArray := []string{}
 	err := json.NewDecoder(r.Body).Decode(&deleteCoffeesArray)
 	if err != nil {
-		http.Error(w, "Некоректный JSON: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if len(deleteCoffeesArray) == 0 {
-		http.Error(w, "Список кофе для удаления пуст", http.StatusBadRequest)
+		http.Error(w, "DeleteCoffee list is empty", http.StatusBadRequest)
 		return
 	}
 
 	for _, value := range deleteCoffeesArray {
 
 		if _, ok := cm.CoffeeDatabase[value]; !ok {
-			badDeletingResponse := fmt.Sprintf("Кофе '%s' не найден", value)
+			badDeletingResponse := fmt.Sprintf("Coffee '%s' not found", value)
 			http.Error(w, badDeletingResponse, http.StatusBadRequest)
 			return
 		}
@@ -41,15 +41,23 @@ func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
 		deletedCoffees = append(deletedCoffees, value)
 	}
 
-	fmt.Printf("Текущее меню: %+v\n", cm.CoffeeDatabase)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	CurrentMenuList := fmt.Sprintf("Current Menu: %+v", cm.CoffeeDatabase)
+	err = json.NewEncoder(w).Encode(CurrentMenuList)
+	if err != nil {
+		http.Error(w, "JSON encoding error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	response := map[string][]string{"Список удалённых кофе": deletedCoffees}
+	response := map[string][]string{"Deleted coffees list": deletedCoffees}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "JSON encoding error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func GetAllCoffeeMenu(w http.ResponseWriter, r *http.Request) { //curl http://localhost:8080/getAllCoffeeMenu
+func GetAllCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(cm.CoffeeDatabase)
 	if err != nil {
-		http.Error(w, "Ошибка кодирования JSON", http.StatusInternalServerError)
+		http.Error(w, "JSON encoding error: ", http.StatusInternalServerError)
 		return
 	}
 }

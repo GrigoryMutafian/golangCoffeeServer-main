@@ -12,9 +12,9 @@ func main() {
 	http.HandleFunc("/deleteCoffee", hn.DeleteCoffee)
 	http.HandleFunc("/updateCoffeeMenu", hn.UpdateCoffeeMenu)
 	http.HandleFunc("/GetStatusCoffees", hn.GetStatusCoffees)
-	fmt.Println("Сервер запущен на http://localhost:8080")
+	fmt.Println("server running on http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		fmt.Println("сервер не запущен", err)
+		fmt.Println("the server is not running", err)
 	}
 }

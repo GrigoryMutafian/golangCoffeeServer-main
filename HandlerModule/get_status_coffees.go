@@ -9,7 +9,7 @@ import (
 func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Неправильный метод: ", http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed: ", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -18,7 +18,7 @@ func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 	statusesArray := []cm.Status{}
 	err := json.NewDecoder(r.Body).Decode(&statusesArray)
 	if err != nil {
-		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "JSON decoding error:: "+err.Error(), http.StatusInternalServerError)
 	}
 
 	response := make(map[string]cm.Status)
@@ -34,6 +34,6 @@ func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(&response)
 	if err != nil {
-		http.Error(w, "Ошибка кодирования JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "JSON encoding error: "+err.Error(), http.StatusInternalServerError)
 	}
 }
