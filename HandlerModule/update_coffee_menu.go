@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+var Update string
+
 func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPatch {
 		http.Error(w, "Method Not Allowed: ", http.StatusMethodNotAllowed)
@@ -25,7 +27,7 @@ func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	for key, newValue := range updateCoffee {
 		if _, exists := cm.CoffeeDatabase[key]; exists {
 			cm.CoffeeDatabase[key] = newValue
-			cm.Update = key
+			Update = key
 		} else {
 			http.Error(w, "Coffee not found", http.StatusNotFound)
 			return
