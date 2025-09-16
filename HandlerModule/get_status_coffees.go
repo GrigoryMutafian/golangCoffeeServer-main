@@ -3,6 +3,7 @@ package HandlerModule
 import (
 	"encoding/json"
 	cm "golangCoffeeServer-main/coffeeModel"
+	"golangCoffeeServer-main/db"
 	"net/http"
 )
 
@@ -21,14 +22,34 @@ func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "JSON decoding error:: "+err.Error(), http.StatusInternalServerError)
 	}
 
-	response := make(map[string]cm.Status)
+	response := make(map[cm.Status][]int)
 
 	for _, value := range statusesArray {
-		for key := range cm.CoffeeDatabase {
-			if cm.CoffeeDatabase[key].Status == value {
-				response[key] = cm.CoffeeDatabase[key].Status
-			}
+		rows, err := db.DB.Query(`select id from coffees
+		WHERE status = $1`, value)
+
+		if err != nil {
+			http.Error(w, "DB query error", http.StatusInternalServerError)
+			return
 		}
+
+		defer rows.Close()
+
+		var currentStatusId int
+		currentStatusIdArray := []int{}
+
+		for rows.Next() {
+			err := rows.Scan(&currentStatusId)
+
+			if err != nil {
+				http.Error(w, "String processing error", http.StatusInternalServerError)
+				return
+			}
+
+			currentStatusIdArray = append(currentStatusIdArray, currentStatusId)
+		}
+
+		response[value] = currentStatusIdArray
 	}
 
 	w.Header().Set("Content-Type", "application/json")
