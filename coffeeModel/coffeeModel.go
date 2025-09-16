@@ -39,4 +39,14 @@ var CoffeeDatabase = map[string]Coffee{
 	},
 }
 
+type CoffeeInput struct {
+	ID          int     `json: id, omitempty`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Weight      float64 `json:"weight"`
+	RoastLevel  string  `json:"roast_level"`
+	Status      string  `json:"status"`
+}
+
 var Update string

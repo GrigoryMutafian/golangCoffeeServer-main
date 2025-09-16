@@ -2,18 +2,10 @@ package HandlerModule
 
 import (
 	"encoding/json"
+	cm "golangCoffeeServer-main/coffeeModel"
 	"golangCoffeeServer-main/db"
 	"net/http"
 )
-
-type CoffeeInput struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Weight      float64 `json:"weight"`
-	RoastLevel  string  `json:"roast_level"`
-	Status      string  `json:"status"`
-}
 
 func AddNewCoffee(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -22,7 +14,7 @@ func AddNewCoffee(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
-	var newCoffee CoffeeInput
+	var newCoffee cm.CoffeeInput
 
 	err := json.NewDecoder(r.Body).Decode(&newCoffee)
 

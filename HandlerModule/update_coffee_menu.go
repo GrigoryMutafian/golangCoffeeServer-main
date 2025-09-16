@@ -3,10 +3,9 @@ package HandlerModule
 import (
 	"encoding/json"
 	cm "golangCoffeeServer-main/coffeeModel"
+	"golangCoffeeServer-main/db"
 	"net/http"
 )
-
-var Update string
 
 func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPatch {
@@ -15,7 +14,7 @@ func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
-	var updateCoffee map[string]cm.Coffee
+	var updateCoffee cm.CoffeeInput
 	err := json.NewDecoder(r.Body).Decode(&updateCoffee)
 	if err != nil {
 		http.Error(w, "JSON decoding error: "+err.Error(), http.StatusBadRequest)
@@ -24,21 +23,32 @@ func UpdateCoffeeMenu(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	for key, newValue := range updateCoffee {
-		if _, exists := cm.CoffeeDatabase[key]; exists {
-			cm.CoffeeDatabase[key] = newValue
-			Update = key
-		} else {
-			http.Error(w, "Coffee not found", http.StatusNotFound)
-			return
-		}
+	result, err := db.DB.Exec(`UPDATE coffees 
+	                           SET name = $1, description = $2, price = $3, weight = $4, roast_level = $5, status = $6
+	                           WHERE id = $7`,
+		updateCoffee.Name, updateCoffee.Description, updateCoffee.Price, updateCoffee.Weight, updateCoffee.RoastLevel, updateCoffee.Status, updateCoffee.ID)
+
+	if err != nil {
+		http.Error(w, "Database manipulating error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		http.Error(w, "Error checking rows affected: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if rowsAffected == 0 {
+		http.Error(w, "No rows updated", http.StatusNotFound)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	response := map[string]string{"message": "Coffee " + cm.Update + " updated"}
+	w.WriteHeader(http.StatusOK)
+	response := map[string]string{"message": "Coffee " + updateCoffee.Name + " updated"}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "JSON encoding error: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
