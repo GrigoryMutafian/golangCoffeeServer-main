@@ -13,6 +13,9 @@ func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	defer r.Body.Close()
+
 	var coffeeRemover int
 
 	err := json.NewDecoder(r.Body).Decode(&coffeeRemover)
@@ -33,7 +36,7 @@ func DeleteCoffee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rowsAffected == 0 {
-		http.Error(w, "No rows inserted", http.StatusInternalServerError)
+		http.Error(w, "No rows inserted", http.StatusNotFound)
 		return
 	}
 

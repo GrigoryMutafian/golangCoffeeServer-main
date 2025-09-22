@@ -18,27 +18,6 @@ const (
 	HighStatus   = "HighStatus"
 )
 
-var CoffeeDatabase = map[string]Coffee{
-	"coffee_id_1": {
-		ID:          1,
-		Name:        "Supremo",
-		Description: "Best coffee from Colombia",
-		Price:       120.0,
-		Weight:      250.0,
-		RoastLevel:  "Medium",
-		Status:      LowStatus,
-	},
-	"coffee_id_2": {
-		ID:          2,
-		Name:        "kek",
-		Description: "Best coffee from Russia",
-		Price:       120.0,
-		Weight:      250.0,
-		RoastLevel:  "Medium",
-		Status:      MediumStatus,
-	},
-}
-
 type CoffeeInput struct {
 	ID          int     `json: id, omitempty`
 	Name        string  `json:"name"`

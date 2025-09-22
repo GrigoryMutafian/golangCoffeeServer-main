@@ -14,6 +14,8 @@ func AddNewCoffee(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
+	defer r.Body.Close()
+
 	var newCoffee cm.CoffeeInput
 
 	err := json.NewDecoder(r.Body).Decode(&newCoffee)
@@ -22,8 +24,6 @@ func AddNewCoffee(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	defer r.Body.Close() //
 
 	result, err := db.DB.Exec(
 		`INSERT INTO coffees (name, description, price, weight, roast_level, status)

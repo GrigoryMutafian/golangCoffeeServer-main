@@ -15,11 +15,13 @@ func GetStatusCoffees(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	defer r.Body.Close()
 
 	statusesArray := []cm.Status{}
 	err := json.NewDecoder(r.Body).Decode(&statusesArray)
 	if err != nil {
 		http.Error(w, "JSON decoding error:: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	response := make(map[cm.Status][]int)
