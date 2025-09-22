@@ -10,9 +10,8 @@ import (
 var DB *sql.DB
 
 func InitDB() error {
-	connStr := "user=postgres password=grisha22000044 dbname=coffee_db sslmode=disable"
 	var err error
-	DB, err = sql.Open("postgres", connStr)
+	DB, err = sql.Open("postgres", ConnStr)
 	if err != nil {
 		return fmt.Errorf("database connection error %v", err)
 	}
